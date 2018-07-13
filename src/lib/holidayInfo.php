@@ -30,4 +30,11 @@ class HolidayInfo
     var $isFreeDay;
 
 
+    /**
+     * @var boolean
+     */
+    var $isNational;
+
+
+
 }

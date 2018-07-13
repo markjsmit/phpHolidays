@@ -18,9 +18,13 @@ class HTML
      */
     private $element;
 
-    function __construct($html)
+    function __construct($html,$asXML=false)
     {
-        $this->element = DOMDocument::loadHTML($html);
+        if($asXML){
+            $this->element = @DOMDocument::loadXML($html);
+        }else {
+            $this->element = @DOMDocument::loadHTML($html);
+        }
     }
 
 
@@ -82,7 +86,7 @@ class HTML
         $result = [];
         if ($queryResult) {
             foreach ($queryResult as $elem) {
-                $result[] = new HTML($this->element->saveHtml($elem));
+                $result[] = new HTML($this->element->saveHtml($elem),true);
             }
         }
         return $result;
@@ -101,6 +105,15 @@ class HTML
 
     function getText(){
         return $this->element->textContent;
+    }
+
+    function getCleanText(){
+        return trim(str_replace("\n","",$this->getText()));
+    }
+
+    function getAttribute($name){
+        return $this->element->childNodes[0]->getAttribute($name);
+
     }
 }
 

@@ -10,12 +10,10 @@ use MJSHolidays\lib\Http;
  * @author Mark Smit
  * @link https://github.com/maxpower89/phpDutchHolidays
  */
-class Netherlands extends baseProvider
+class UnitedKingdom extends baseProvider
 {
-    private $url = "https://www.feestdagen-nederland.nl/feestdagen-{year}.html";
-    private $monthNames=["januari","februari","maart","april","mei","juni","juli","augustus","september","oktober","november","december"];
-
-
+    private $url = "https://www.officeholidays.com/countries/united_kingdom/{year}.php";
+    private $monthNames=["January","February","March","April","May","June","July","August","September","October","November","December"];
     /**
      * @param \DateTime $from
      * @param \DateTime $until
@@ -42,20 +40,14 @@ class Netherlands extends baseProvider
         $url = str_replace("{year}", $year, $this->url);
         $http = new Http();
         $content = $http->get($url);
-        return $this->parseContent($content);
+        return $this->parseContent($content,$year);
     }
 
-    function parseContent($content)
+    function parseContent($content,$year)
     {
         $result=[];
-        $result+=$this->getDays($content,"feestdagen_schema",true);
-        $result+=$this->getDays($content,"feestdagen_schema_overig",false);
-        return $result;
-    }
-
-    function getDays($content,$tableId,$official){
         $html = new HTML($content);
-        $table = $html->getById($tableId);
+        $table = $html->getByTagName("tbody")[0];
         $rows = $table->getByTagName("tr");
         foreach ($rows as $key => $row) {
             $columns = $row->getByTagName("td");
@@ -64,36 +56,37 @@ class Netherlands extends baseProvider
                 $resultRow[] = $column;
             }
             if(count($resultRow)){
-                $result[]=$this->parseRow($resultRow,$official);
+                $result[]=$this->parseRow($resultRow,$row,$year);
             }
         }
         return $result;
     }
 
+
+
     /**
      * @param HTML[] $rowInfo
+     * @param HTML $rowHtml
      */
-    function parseRow($rowInfo,$official=true){
+    function parseRow($rowInfo,$rowHtml,$year){
         $infoObject=new HolidayInfo();
+        $cls=$rowHtml->getAttribute("class");
+        $infoObject->name=$rowInfo[2]->getCleanText();
+        $infoObject->isOfficial=$cls=="holiday"||$cls=="regional";
+        $infoObject->isFreeDay=$infoObject->isOfficial;
+        $infoObject->isNational=$cls=="holiday";
 
-        $infoObject->isOfficial=$official;
-        $infoObject->name=$rowInfo[0]->getCleanText();
-        $infoObject->date=$this->toDateTime($rowInfo[1]->getText());
-        $infoObject->isNational=true;
-
-        if($rowInfo[0]->getByClass("vrije_feestdag")){
-            $infoObject->isFreeDay=true;
-        }else{
-            $infoObject->isFreeDay=false;
-        }
+        $infoObject->date=$this->toDateTime($rowInfo[1]->getCleanText(),$year);
 
         return $infoObject;
     }
 
-    function toDateTime($string){
+    function toDateTime($string,$year){
+        $string=substr($string,0,10);
         $split=explode(" ",$string);
-        $split[1]=array_search($split[1],$this->monthNames)+1;
-        return new \DateTime($split[2]."-".$split[1]."-".$split[0]);
+        $split[0]=array_search($split[0],$this->monthNames)+1;
+
+        return new \DateTime($year."-".$split[0]."-".$split[1]);
     }
 }
 
