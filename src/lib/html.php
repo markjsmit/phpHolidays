@@ -46,18 +46,18 @@ class HTML
      * @param string $class
      * @return HTML[]
      */
-    function getByClass($class)
+    function getByClass($class,$createHtmlObject=true)
     {
-        return $this->getByAttribute("class", $class);
+        return $this->getByAttribute("class", $class,$createHtmlObject);
     }
 
     /**
      * @param string $tagName
      * @return HTML[]
      */
-    function getByTagName($tagName)
+    function getByTagName($tagName,$createHtmlObject=true)
     {
-        return $this->getByFilter("//" . $tagName);
+        return $this->getByFilter("//" . $tagName,$createHtmlObject);
     }
 
     /**
@@ -66,9 +66,9 @@ class HTML
      * @return HTML[]
      */
 
-    function getByAttribute($attr, $value)
+    function getByAttribute($attr, $value,$createHtmlObject=true)
     {
-        $result = $this->getByFilter("//*[contains(concat(' ', normalize-space(@" . $attr . "), ' '), ' $value ')]");
+        $result = $this->getByFilter("//*[contains(concat(' ', normalize-space(@" . $attr . "), ' '), ' $value ')]0",$createHtmlObject);
         if (count($result)) {
             return $result;
         }
@@ -79,14 +79,18 @@ class HTML
      * @param string $filter
      * @return HTML[]
      */
-    function getByFilter($filter)
+    function getByFilter($filter,$createHtmlObject=true)
     {
         $finder = new DomXPath($this->element);
         $queryResult = $finder->query($filter);
         $result = [];
         if ($queryResult) {
             foreach ($queryResult as $elem) {
-                $result[] = new HTML($this->element->saveHtml($elem),true);
+                if($createHtmlObject) {
+                    $result[] = new HTML($this->element->saveHtml($elem), true);
+                }else{
+                    $result[]=$this->element->saveHtml($elem);
+                }
             }
         }
         return $result;
