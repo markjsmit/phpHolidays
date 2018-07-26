@@ -9,7 +9,7 @@ use DOMXPath;
 /**
  * @copyright Mark Smit 2018
  * @author Mark Smit
- * @link https://github.com/maxpower89/phpDutchHolidays
+ * @link https://github.com/maxpower89/phpHolidays
  */
 class HTML
 {
