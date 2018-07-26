@@ -6,7 +6,7 @@ A simple php library which makes it easy to fetch holidays from sources based on
 2. Germany
 3. UnitedKingdom
 
-##sample of use
+## sample of use
 ```php
 <?php
 use MJSHolidays\Holidays;
