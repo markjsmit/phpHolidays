@@ -20,10 +20,11 @@ class HTML
 
     function __construct($html,$asXML=false)
     {
+        $this->element=new DOMDocument();
         if($asXML){
-            $this->element = @DOMDocument::loadXML($html);
+            $this->element->loadXML($html);
         }else {
-            $this->element = @DOMDocument::loadHTML($html);
+            $this->element->loadHTML($html);
         }
     }
 
