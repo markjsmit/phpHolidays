@@ -69,7 +69,7 @@ class HTML
 
     function getByAttribute($attr, $value,$createHtmlObject=true)
     {
-        $result = $this->getByFilter("//*[contains(concat(' ', normalize-space(@" . $attr . "), ' '), ' $value ')]0",$createHtmlObject);
+        $result = $this->getByFilter("//*[contains(concat(' ', normalize-space(@" . $attr . "), ' '), ' $value ')]",$createHtmlObject);
         if (count($result)) {
             return $result;
         }
